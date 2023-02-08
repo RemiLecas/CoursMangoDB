@@ -774,10 +774,15 @@ Exercice 3
 var pipeline = [{
 	$match : {}
 	}, {
-	$project: {
-		$substrBytes: [ "$adresse.codePostal", 0, 1 ],
+		$project: {
+			"adresse.codePostal": {$substrBytes: [ "$adresse.codePostal", 0, 2 ]},
 	}
-}]
+},{
+		$group: { "_id": "$adresse.codePostal", "capaciteTotal": {$sum: "$capacite"}}
+	},{
+		$sort: {"_id": 1}
+	}
+]
 
 db.salles.aggregate(pipeline)
 ```
@@ -785,6 +790,23 @@ db.salles.aggregate(pipeline)
 Exercice 4
 
 Écrivez le pipeline qui affichera, pour chaque style musical, le nombre de salles le programmant. Ces styles seront classés par ordre alphabétique.
+
+```javascript
+var pipeline = [{
+	$match : {}
+	}, { 
+		$unwind: "$styles"
+	},{
+		$group: { "_id": "$styles", "nbSalles": {$sum: 1} }
+	},{
+		$sort: {"_id": 1}
+	}
+]
+
+db.salles.aggregate(pipeline)
+```
+
+![[Pasted image 20230208221859.png]]
 
 Exercice 5
 
@@ -794,9 +816,49 @@ celles de 100 à 500 places
 
 celles de 500 à 5000 places
 
+```javascript
+var pipeline = [
+	{ 
+		$bucket: {
+			 groupBy: "$capacite",
+			 boundaries: [100, 500, 5000], 
+			 default: "other", 
+			 output: { "count": { $sum: 1 } } } },
+		{ $sort: { _id: 1 } }
+]
+
+db.salles.aggregate(pipeline)
+```
+
+![[Pasted image 20230208222445.png]]
+
 Exercice 6
 
 Écrivez le pipeline qui affichera le nom des salles ainsi qu’un tableau nommé avis_excellents qui contiendra uniquement les avis dont la note est de 10.
+
+```javascript
+var pipeline = [
+	{ 
+		$match: { 
+			"avis.note": 10 } 
+		},{ 
+		$project: { 
+			"nom": 1, "avis_excellents": { 
+				$filter: { 
+					input: "$avis", as: "avis", 
+					cond: { 
+						$eq: ["$$avis.note", 10] 
+					} 
+				} 
+			}
+		}
+	}
+]
+
+db.salles.aggregate(pipeline)
+```
+
+![[Pasted image 20230208222904.png]]
 
 # Exo Index
 
