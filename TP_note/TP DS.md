@@ -119,7 +119,7 @@ var tempMoyenne = [
 		}
 	},{
 		$project: {
-			"_id_": 1,
+			"_id": 1,
 			"temp": 1,			
 		}
 	},{
@@ -162,7 +162,7 @@ var tempMaxEte = [
 		}
 	},{
 		$project: {
-			"_id_": 1,
+			"_id": 1,
 			"temp": 1,			
 		}
 	},{
