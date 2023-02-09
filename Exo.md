@@ -869,28 +869,34 @@ db.salles.find(requete ... };
 Réponse :
 
 ```javascript
-
-var polygoneSalle = [
-	[43.951616, 4.80143], //
-	[43.95475, 4.80779],
-	[43.95045, 4.81097],
-	[43.4657, 4.80449]
-]
-
+var KilometresEnRadians = function(kilometres){ 
+   var rayonTerrestreEnKm = 6371; 
+   return kilometres / rayonTerrestreEnKm; 
+}; 
+ 
+var salle = db.salles.findOne({"adresse.ville": "Nîmes"}); 
+ 
 var requete = {
-	type: "Point", coordinates: [4.805325, 43.949749]
-}
+   "localisation": {
+      $geoWithin: {
+         $centerSphere: [
+            [
+	            salle.adresse.localisation.coordinates[0], 
+	            salle.adresse.localisation.coordinates[1] 
+	        ],
+            KilometresEnRadians(60)
+         ]
+      }
+   },
+   "styles": {
+      $in: ["Blues", "Soul"]
+   }
+}; 
+ 
+db.salles.find(requete, {"nom": 1}); 
 
-db.salles.find({
-		"localisation": {
-			$geoWithin: {
-				$polygon: salle
-			}
-		}
-	},{
-		"_id": 0, "nom": 1
-	})
 ```
+
 Exercice 2:
 
 Écrivez la requête qui permet d’obtenir la ville des salles situées dans un rayon de 100 kilomètres autour de Marseille, triées de la plus proche à la plus lointaine :
@@ -899,6 +905,39 @@ Exercice 2:
 var marseille = {"type": "Point", "coordinates": [43.300000, 5.400000]} 
  
 db.salles.find(...) 
+```
+
+```javascript
+
+var KilometresEnRadians = function(kilometres)
+{   
+	var rayonTerrestreEnKm = 6371;   
+	return kilometres / rayonTerrestreEnKm;   
+}; 
+
+var marseille = 
+{
+	"type": "Point", 
+	"coordinates": [43.300000, 5.400000]
+}
+
+var requete = {  
+	"adresse.localisation": {  
+	    $geoWithin: {  
+			$centerSphere: 
+			[  
+				[
+					marseille.coordinates[0],
+					marseille.coordinates[1]
+				],  
+				KilometresEnRadians(100)  
+			]  
+		}  
+	},  
+}
+
+db.salles.find(requete, {"nom": 1}).sort( { "adresse.localisation": 1 })
+
 ```
 
 Exercice 3:
@@ -916,8 +955,12 @@ var polygone = {
                [43.94899, 4.80908] 
             ] 
      ] 
-} 
+}
+
+db.salles.find(requete, {"nom": 1})
+
 ```
 
 Donnez le nom des salles qui résident à l’intérieur.
 
+![[Pasted image 20230209222411.png]]
