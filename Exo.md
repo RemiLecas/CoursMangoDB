@@ -652,57 +652,6 @@ Rajoutez aux critères de validation existants le critère suivant :
 Le champ smac doit être présent OU les styles musicaux doivent figurer parmi les suivants : "jazz", "soul", "funk" et "blues".
 
 ```javascript
-// Création du schéma de validation
-var schema = {
-	"_id": {
-		"bsonType": ["int", "objectId"],
-	},
-	"nom": {
-		"bsonType": "string",
-		"pattern": "^[A-Z].*",
-	},
-	"capacite": {
-		"bsonType": "int",
-	},
-	"adresse.ville": {
-		"bsonType": "string",
-		"pattern": "^[A-Z].*",
-	},
-	"adresse.codePostal": {
-		"bsonType": "string",
-		"pattern": "^[A-Z].*",
-	},
-	$or: [{
-		"smac": {
-			"bsonType": "boolean",
-		},
-		"styles": {
-		"enum": ["jazz", "soul", "funk", "blues"],
-		}
-	}]
-}
-
-// Application du validateur avec le schéma de validation
-db.runCommand(
-	{
-		"collMod": "salles",
-		"validator": {			
-			$jsonSchema: {
-				"bsonType": "object",
-				$or: [{
-					"required": [
-						"_id", "nom", "capacite", "adresse.ville", "adresse.codePostal", "smac", "styles"
-					],
-					"required": [
-						"_id", "nom", "capacite", "adresse.ville", "adresse.codePostal", "smac", "smac"
-					],
-				}],
-				
-				"properties": schema
-			}
-		}
-	}
-)
 
 ```
 
@@ -771,21 +720,26 @@ Exercice 3
 
 
 ```javascript
-var pipeline = [{
-	$match : {}
-	}, {
-		$project: {
-			"adresse.codePostal": {$substrBytes: [ "$adresse.codePostal", 0, 2 ]},
-	}
-},{
-		$group: { "_id": "$adresse.codePostal", "capaciteTotal": {$sum: "$capacite"}}
-	},{
-		$sort: {"_id": 1}
-	}
-]
+var pipeline = [ { 
+	$project: { 
+		"_id": 0, 
+		"departement": { 
+			$substrBytes: ["$adresse.codePostal", 0, 2] 
+		}, 
+		"CapaciteTotal": "$capacite" 
+		} 
+	}, { 
+		$group: { 
+			"_id": "$departement", 
+			"capacite_totale": { $sum: "$CapaciteTotal" } 
+		} 
+	} 
+];
 
 db.salles.aggregate(pipeline)
 ```
+
+![[Pasted image 20230209220322.png]]
 
 Exercice 4
 
