@@ -13,15 +13,15 @@ Téléchargez ou générez un jeu de données de stations météorologiques, qui
 Réponse :
 	a et b: 
 		Pour cela j'ai importé un jeu de données de Kaggle qui est "Historical weather data of 194 country capitals" à l'adresse suivante "https://www.kaggle.com/datasets/balabaskar/historical-weather-data-of-all-country-capitals?resource=download". 
-		Je me suis au préalable assuré que les données était compréhensible et en accord avec ce qui est demander au niveau de la présence de certaines données. 
-		Cependant j'ai quand même modifier le type de certains champs notamment le champ date que j'ai passé en type string en type Date, j'ai aussi modifié le type des champs latitude, longitude, tavg, tmin, tmax, wdir, wspd et pres en number car ils étaient de base en type string.
+		Je me suis au préalable assuré que les données étaient compréhensibles et en accord avec ce qui est demandé au niveau de la présence de certaines données. 
+		Cependant j'ai quand même modifié le type de certains champs notamment le champ date que j'ai passé du type string au type Date, j'ai aussi modifié le type des champs latitude, longitude, tavg, tmin, tmax, wdir, wspd et pres en number car ils étaient de base en type string.
 
 2. Indexation avec MongoDB: 
 	a. Créez un index sur le champ de la date pour améliorer les performances de la recherche. Utilisez la méthode createIndex (). 
 	b. Vérifiez que l'index a été créé en utilisant la méthode listIndexes ().
 
 Réponse : 
-	a. Pour créer un index sur le champ date j'ai donc fais comme ceci : 
+	a. Pour créer un index sur le champ date-j'ai donc fais comme ceci : 
 	
 ```javascript
 db.weather.createIndex({
@@ -35,7 +35,7 @@ Voici donc une capture d'écran de la création de mon index :
 ![[Pasted image 20230209102656.png]]
 *Capture d'écran du retour de la requete*
 
-b. Pour vérifier la présence de mon index en utilisant la méthode listIndexes() j'ai fais :
+b. Pour vérifier la présence de mon index en utilisant la méthode listIndexes() j'ai faits :
 
 ```javascript
 db.runCommand ({	
@@ -132,21 +132,20 @@ var tempMoyenne = [
 db.weather.aggregate(tempMoyenne)
 ```
 
-Voici le résultat de la requete précédente :
+Voici le résultat de la requête précédente :
 
 ![[Pasted image 20230209135633.png]]
 *Capture d'écran du retour de la requete*
 
-Dans cette capture d'écran nous voyons que les stations météorologique pour le mois de Janvier puisque comme il y a 194 pays il faut déjà les passer une fois pour voir le mois de Février. Cependant si nous remplacons le $city par Paris par exemple cela nous donne:
+Dans cette capture d'écran nous voyons que les stations météorologiques pour le mois de Janvier puisque comme il y a 194 pays il faut déjà les passer une fois pour voir le mois de Février. 
+Cependant si nous remplaçons le $city par Paris par exemple cela nous donne:
 
 ![[Pasted image 20230209135916.png]]
 *Capture d'écran de la requete jusqu'au mois de Mai.*
 
-
-
 Trouvez la station météorologique qui a enregistré la plus haute température en été. Utilisez le framework d'agrégation de MongoDB pour effectuer des calculs sur les données et trouver la valeur maximale.
 
-b. Afin de trouver la station météorologique qui a enregistré la plus haute température en été je me suis tout d'abord basé sur l'année 2020 comme année de référence puis j'ai fais l'agrégation ci dessous : 
+b. Afin de trouver la station météorologique qui a enregistré la plus haute température en été je me suis tout d'abord basé sur l'année 2020 comme année de référence puis j'ai fais l'agrégation ci-dessous : 
 
 ```javascript
 var tempMaxEte = [
